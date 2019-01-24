@@ -1,9 +1,11 @@
+path <- file.path("I:", "R", "Network Analysis", "Publication Collaboration")
+
 # import data for peer reviewed journal
-prj_csv <- read.csv("Peer-reviewed Journals.csv",
+prj_csv <- read.csv(paste(path, "Peer-reviewed Journals.csv", sep = "/"),
                     header = T,
                     na.strings = "",
                     stringsAsFactors = F)
-con_csv <- read.csv("Conference Proceedings.csv",
+con_csv <- read.csv(paste(path, "Conference Proceedings.csv", sep = "/"),
                     header = T,
                     na.strings = "",
                     stringsAsFactors = F)
@@ -60,27 +62,15 @@ aut_condata$Source <- as.character(aut_condata$Source)
 aut_condata$Target <- as.character(aut_condata$Target)
 aut_condata_clean <- aut_condata[aut_condata$Source != aut_condata$Target, ]
 
-# Writing into csv file
-write.csv(aut_prjdata_clean, file = "edgelist_prj.csv", row.names = F)
-write.csv(aut_condata_clean, file = "edgelist_con.csv", row.names = F)
-
 # Create combination data of conference and peer reviewed journal
 aut_condata_clean$Type <- c("Conference")
 aut_prjdata_clean$Type <- c("Peer reviewed Journal")
 aut_totdata <- rbind(aut_prjdata_clean,aut_condata_clean)
 write.csv(aut_totdata, file = "edgelist_total.csv", row.names = F)
 
-# write csv into utf-8 encoding file
-write.csv(aut_totdata, file = "edgelist_total_utf8.csv", row.names = F, fileEncoding = "UTF-8")
+library(igraph)
 
-# try to analyze when the iteration failed
-for (i in 1:length(prj)) {
-  if (i == 1) {
-    v <- 4
-  }
-  else {
-    x <- length(prj[[i]])
-    v <- v + x
-    print(c(v,i))
-    }
-}
+network <- graph_from_data_frame(aut_condata_clean[, 1:2], directed = FALSE)
+
+V(network)$size <- 2
+plot.igraph(network, layout = layout.fruchterman.reingold, vertex.label = NA)
