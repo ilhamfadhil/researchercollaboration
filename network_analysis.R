@@ -1,6 +1,8 @@
 library(igraph)
 library(tidyverse)
 
+setwd(file.path("I:", "R", "Network Analysis", "Publication Collaboration"))
+
 df <- read_csv(file.choose())
 
 network <- graph_from_data_frame(df[, 1:2], directed = FALSE)
