@@ -1,9 +1,7 @@
 library(igraph)
 library(tidyverse)
 
-path <- file.path("I:", "R", "Network Analysis", "Publication Collaboration")
-
-df <- read_csv(paste(path, "edgelist_total.csv", sep = "/"))
+df <- read_csv(file.choose())
 
 network <- graph_from_data_frame(df[, 1:2], directed = FALSE)
 
@@ -44,3 +42,27 @@ gc <- comps[[1]]
 average.path.length(gc)
 diameter(gc)
 transitivity(gc)
+
+df_group <- df %>%
+  group_by(Source, Target) %>%
+  summarise(n = length(Source))
+
+n <- graph_from_data_frame(df_group[, 1:2], directed = FALSE)
+
+V(n)$size <- 2
+plot.igraph(n, layout = layout.fruchterman.reingold, vertex.label = NA)
+
+comps.n <- decompose.graph(n)
+table(sapply(comps.n, vcount))
+
+gc.n <- comps.n[[which.max(sapply(comps.n, vcount))]]
+simple.gc.n <- igraph::simplify(gc.n)
+plot.igraph(simple.gc.n, layout = layout.fruchterman.reingold, vertex.label = NA)
+
+deg.simple <- degree(simple.gc.n)
+sort(deg.simple, decreasing = TRUE)[1:20]
+
+diameter(simple.gc.n)
+average.path.length(simple.gc.n)
+
+kc <- fastgreedy.community(simple.gc.n)
