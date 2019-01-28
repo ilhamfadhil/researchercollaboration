@@ -1,7 +1,7 @@
 library(igraph)
 library(tidyverse)
 
-setwd(file.path("I:", "R", "Network Analysis", "Publication Collaboration"))
+setwd(file.path("C:", "Users", "ilham","Documents", "Github", "researchercollaboration"))
 
 df <- read_csv(file.choose())
 
@@ -59,7 +59,15 @@ table(sapply(comps.n, vcount))
 
 gc.n <- comps.n[[which.max(sapply(comps.n, vcount))]]
 simple.gc.n <- igraph::simplify(gc.n)
+
+png("network-basic-giant-comp.png",
+    width  = 3.25,
+    height = 3.25,
+    units  = "in",
+    res    = 1200,
+    pointsize = 4)
 plot.igraph(simple.gc.n, layout = layout.fruchterman.reingold, vertex.label = NA)
+dev.off()
 
 deg.simple <- degree(simple.gc.n)
 sort(deg.simple, decreasing = TRUE)[1:20]
